@@ -19,7 +19,7 @@
 * git pull
 * git push
 
-###Om något är klart###
+### Om något är klart ###
 
 * git pull origin master
 * Skapa pullrequest
