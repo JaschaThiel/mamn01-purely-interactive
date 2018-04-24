@@ -2,6 +2,7 @@
 
 ## Useful links ##
 * https://developers.google.com/android/guides/setup
+* https://github.com/googlemaps/android-samples/tree/master/ApiDemos/java/app/src/main/java/com/example/mapdemo
 
 ## Git ##
 
