@@ -1,16 +1,16 @@
 # mamn01-purely-interactive
 
-## Useful links##
+## Useful links ##
 * https://developers.google.com/android/guides/setup
 
-##Git##
+## Git ##
 
-###Första gången###
+### Första gången ###
 
 * git clone + länk till repot
 * git checkout workbranch
 
-###Efter det###
+### Efter det ###
 
 * git pull
 * jobbajobbajobba
