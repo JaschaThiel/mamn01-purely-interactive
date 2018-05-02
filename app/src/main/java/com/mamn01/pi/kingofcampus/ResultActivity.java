@@ -1,10 +1,13 @@
 package com.mamn01.pi.kingofcampus;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 
-/**
- * Created by Assar on 2018-05-02.
- */
+public class ResultActivity extends AppCompatActivity {
 
-public class ResultActivity extends Activity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_result);
+    }
 }
