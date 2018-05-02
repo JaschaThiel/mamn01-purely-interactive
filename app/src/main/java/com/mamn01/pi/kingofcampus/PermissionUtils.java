@@ -1,4 +1,4 @@
-package com.mamn01.pi.kingofcampus.map;
+package com.mamn01.pi.kingofcampus;
 
 /**
  * Created by Assar on 2018-04-24.
@@ -14,8 +14,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
-
-import com.mamn01.pi.kingofcampus.R;
 
 /**
  * Utility class for access to runtime permissions.

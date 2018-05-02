@@ -1,4 +1,4 @@
-package com.mamn01.pi.kingofcampus.map;
+package com.mamn01.pi.kingofcampus;
 
 /**
  * Created by Assar on 2018-04-24.
@@ -9,7 +9,6 @@ import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.mamn01.pi.kingofcampus.R;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
