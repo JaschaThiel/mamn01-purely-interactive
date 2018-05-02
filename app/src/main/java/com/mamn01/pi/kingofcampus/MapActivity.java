@@ -9,6 +9,8 @@ import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -96,6 +98,10 @@ public class MapActivity extends AppCompatActivity
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
+        LatLngBounds ADELAIDE = new LatLngBounds(
+                new LatLng(55.714286, 13.210452), new LatLng(55.715494, 13.215130));
+// Constrain the camera target to the Adelaide bounds.
+        mMap.setLatLngBoundsForCameraTarget(ADELAIDE);
     }
 
     /**
