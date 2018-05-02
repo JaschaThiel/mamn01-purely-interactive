@@ -4,19 +4,25 @@ package com.mamn01.pi.kingofcampus;
  * Created by Assar on 2018-04-24.
  */
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -32,6 +38,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This demo shows how GMS Location can be used to check for changes to the users location.  The
  * "My Location" button uses GMS Location to set the blue dot representing the users location.
@@ -44,7 +53,8 @@ public class MapActivity extends AppCompatActivity
         OnMyLocationClickListener,
         OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback,
-        NavigationView.OnNavigationItemSelectedListener{
+        NavigationView.OnNavigationItemSelectedListener,
+        GoogleMap.OnCircleClickListener{
 
     /**
      * Request code for location permission request.
@@ -60,6 +70,7 @@ public class MapActivity extends AppCompatActivity
     private boolean mPermissionDenied = false;
 
     private GoogleMap mMap;
+    private List<CapturePoint> capturePointList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,8 +100,10 @@ public class MapActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        capturePointList = new ArrayList<>();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
@@ -98,10 +111,26 @@ public class MapActivity extends AppCompatActivity
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
-        LatLngBounds ADELAIDE = new LatLngBounds(
-                new LatLng(55.714286, 13.210452), new LatLng(55.715494, 13.215130));
+        mMap.setMaxZoomPreference(20);
+        mMap.setMinZoomPreference(15);
+        LatLngBounds CAMPUS = new LatLngBounds(
+                new LatLng(55.708603, 13.201834), new LatLng(55.717089, 13.216675));
 // Constrain the camera target to the Adelaide bounds.
-        mMap.setLatLngBoundsForCameraTarget(ADELAIDE);
+        mMap.setLatLngBoundsForCameraTarget(CAMPUS);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(CAMPUS.getCenter(), 16f));
+//        Circle circle = map.addCircle(new CircleOptions()
+//                .center(new LatLng(55.712386, 13.209087))
+//                .radius(5)
+//                .strokeColor(Color.TRANSPARENT)
+//                .fillColor(Color.argb(0.5f,0,0,255)));
+        mMap.setOnCircleClickListener(this);
+        CapturePoint cp = new CapturePoint("kårhuset",mMap, new LatLng(55.712386, 13.209087));
+        CapturePoint p2 = new CapturePoint("IKDC",mMap, new LatLng(55.715135, 13.212273));
+        capturePointList.add(cp);
+        capturePointList.add(p2);
+
+//        circle.setClickable(true);
+//        onCircleClick(cp.getCircle());
     }
 
     /**
@@ -118,6 +147,10 @@ public class MapActivity extends AppCompatActivity
             mMap.setMyLocationEnabled(true);
         }
     }
+
+
+
+
 
     @Override
     public boolean onMyLocationButtonClick() {
@@ -214,4 +247,15 @@ public class MapActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onCircleClick(Circle circle) {
+        Toast t = new Toast(this);
+        String s = "unknown";
+        for(CapturePoint p : capturePointList){
+            if(circle.getId().equals(p.getCircle().getId())){
+                s = p.getName();
+            }
+        }
+        t.makeText(this, s, Toast.LENGTH_LONG).show();
+    }
 }
