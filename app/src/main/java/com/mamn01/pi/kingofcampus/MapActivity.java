@@ -124,9 +124,9 @@ public class MapActivity extends AppCompatActivity
 //                .strokeColor(Color.TRANSPARENT)
 //                .fillColor(Color.argb(0.5f,0,0,255)));
         mMap.setOnCircleClickListener(this);
-        CapturePoint cp = new CapturePoint("kårhuset",mMap, new LatLng(55.712386, 13.209087));
+        CapturePoint p1 = new CapturePoint("kårhuset",mMap, new LatLng(55.712386, 13.209087));
         CapturePoint p2 = new CapturePoint("IKDC",mMap, new LatLng(55.715135, 13.212273));
-        capturePointList.add(cp);
+        capturePointList.add(p1);
         capturePointList.add(p2);
 
 //        circle.setClickable(true);
