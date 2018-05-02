@@ -22,6 +22,22 @@
         android:fitsSystemWindows="true"
         tools:openDrawer="start">
 
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.infogird.www.location_button_reposition.MapFragment">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+    </FrameLayout>
+
         <include
             layout="@layout/app_bar_main2"
             android:layout_width="match_parent"
@@ -36,20 +52,6 @@
         app:headerLayout="@layout/nav_header_main2"
         app:menu="@menu/activity_main2_drawer" />
 
-
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/layout">
-
-        <fragment
-            android:id="@+id/map"
-            class="com.google.android.gms.maps.SupportMapFragment"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </FrameLayout>
 
     </android.support.v4.widget.DrawerLayout>
 

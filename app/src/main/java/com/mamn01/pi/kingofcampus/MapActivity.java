@@ -36,6 +36,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -70,6 +71,7 @@ public class MapActivity extends AppCompatActivity
     private boolean mPermissionDenied = false;
 
     private GoogleMap mMap;
+    private View mapView;
     private List<CapturePoint> capturePointList;
 
     @Override
@@ -80,17 +82,17 @@ public class MapActivity extends AppCompatActivity
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+        mapView = mapFragment.getView();
+        createHeader();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        capturePointList = new ArrayList<>();
+    }
+
+    private void createHeader(){
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -100,7 +102,6 @@ public class MapActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        capturePointList = new ArrayList<>();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -128,6 +129,20 @@ public class MapActivity extends AppCompatActivity
         CapturePoint p2 = new CapturePoint("IKDC",mMap, new LatLng(55.715135, 13.212273));
         capturePointList.add(p1);
         capturePointList.add(p2);
+
+
+        if (mapView != null &&
+                mapView.findViewById(Integer.parseInt("1")) != null) {
+            // Get the button view
+            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+            // and next place it, on bottom right (as Google Maps app)
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
+                    locationButton.getLayoutParams();
+            // position on right bottom
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+            layoutParams.setMargins(0, 0, 30, 30);
+        }
 
 //        circle.setClickable(true);
 //        onCircleClick(cp.getCircle());
@@ -215,9 +230,6 @@ public class MapActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
