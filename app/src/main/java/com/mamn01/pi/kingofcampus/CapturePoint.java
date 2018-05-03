@@ -9,6 +9,8 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Random;
+
 /**
  * Created by Assar on 2018-05-02.
  */
@@ -27,7 +29,12 @@ public class CapturePoint {
                 .strokeColor(Color.TRANSPARENT)
                 .fillColor(Color.argb(0.5f,0,0,255)));
         area.setClickable(true);
-        
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void chaneColor(){
+        Random rand = new Random();
+        area.setFillColor(Color.argb(0.5f,(int)rand.nextFloat()*255,(int)rand.nextFloat()*255,(int)rand.nextFloat()*255));
     }
 
     public Circle getCircle(){

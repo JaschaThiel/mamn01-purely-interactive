@@ -18,6 +18,11 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -55,8 +60,8 @@ public class MapActivity extends AppCompatActivity
         OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback,
         NavigationView.OnNavigationItemSelectedListener,
-        GoogleMap.OnCircleClickListener{
-
+        GoogleMap.OnCircleClickListener,
+        SensorEventListener{
     /**
      * Request code for location permission request.
      *
@@ -72,7 +77,13 @@ public class MapActivity extends AppCompatActivity
 
     private GoogleMap mMap;
     private View mapView;
-    private List<CapturePoint> capturePointList;
+
+    // variables for shake detection
+    private static final float SHAKE_THRESHOLD = 3.25f; // m/S**2
+    private static final int MIN_TIME_BETWEEN_SHAKES_MILLISECS = 1000;
+    private long mLastShakeTime;
+    private SensorManager mSensorManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +96,14 @@ public class MapActivity extends AppCompatActivity
         mapView = mapFragment.getView();
         createHeader();
 
-        capturePointList = new ArrayList<>();
+        // Get a sensor manager to listen for shakes
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        // Listen for shakes
+        Sensor accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if (accelerometer != null) {
+            mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
     private void createHeader(){
@@ -116,20 +134,11 @@ public class MapActivity extends AppCompatActivity
         mMap.setMinZoomPreference(15);
         LatLngBounds CAMPUS = new LatLngBounds(
                 new LatLng(55.708603, 13.201834), new LatLng(55.717089, 13.216675));
-// Constrain the camera target to the Adelaide bounds.
+        // Constrain the camera target to the Adelaide bounds.
         mMap.setLatLngBoundsForCameraTarget(CAMPUS);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(CAMPUS.getCenter(), 16f));
-//        Circle circle = map.addCircle(new CircleOptions()
-//                .center(new LatLng(55.712386, 13.209087))
-//                .radius(5)
-//                .strokeColor(Color.TRANSPARENT)
-//                .fillColor(Color.argb(0.5f,0,0,255)));
         mMap.setOnCircleClickListener(this);
-        CapturePoint p1 = new CapturePoint("kårhuset",mMap, new LatLng(55.712386, 13.209087));
-        CapturePoint p2 = new CapturePoint("IKDC",mMap, new LatLng(55.715135, 13.212273));
-        capturePointList.add(p1);
-        capturePointList.add(p2);
-
+        GameSettings.init(mMap);
 
         if (mapView != null &&
                 mapView.findViewById(Integer.parseInt("1")) != null) {
@@ -160,6 +169,7 @@ public class MapActivity extends AppCompatActivity
         } else if (mMap != null) {
             // Access to the location has been granted to the app.
             mMap.setMyLocationEnabled(true);
+
         }
     }
 
@@ -178,6 +188,7 @@ public class MapActivity extends AppCompatActivity
     @Override
     public void onMyLocationClick(@NonNull Location location) {
         Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
+
     }
 
     @Override
@@ -262,12 +273,43 @@ public class MapActivity extends AppCompatActivity
     @Override
     public void onCircleClick(Circle circle) {
         Toast t = new Toast(this);
+
         String s = "unknown";
-        for(CapturePoint p : capturePointList){
+        List<CapturePoint> temp = GameSettings.capturePointList;
+        for(CapturePoint p : temp){
             if(circle.getId().equals(p.getCircle().getId())){
                 s = p.getName();
             }
         }
         t.makeText(this, s, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            long curTime = System.currentTimeMillis();
+            if ((curTime - mLastShakeTime) > MIN_TIME_BETWEEN_SHAKES_MILLISECS) {
+
+                float x = event.values[0];
+                float y = event.values[1];
+                float z = event.values[2];
+
+                double acceleration = Math.sqrt(Math.pow(x, 2) +
+                        Math.pow(y, 2) +
+                        Math.pow(z, 2)) - SensorManager.GRAVITY_EARTH;
+
+                if (acceleration > SHAKE_THRESHOLD) {
+                    mLastShakeTime = curTime;
+                    Toast t = new Toast(this);
+                    t.makeText(this, "Shaky-shaky", Toast.LENGTH_LONG).show();
+                    
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
     }
 }
