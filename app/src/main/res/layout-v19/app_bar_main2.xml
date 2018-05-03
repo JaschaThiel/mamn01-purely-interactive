@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:fadeScrollbars="false">
+        android:theme="@android:style/Theme.Holo.NoActionBar.TranslucentDecor"
+        tools:alpha="1">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
