@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        tools:alpha="1">
+        android:fadeScrollbars="false">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
