@@ -4,6 +4,8 @@ package com.mamn01.pi.kingofcampus;
  * Created by Assar on 2018-04-24.
  */
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
@@ -14,6 +16,8 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -61,13 +65,14 @@ public class MapActivity extends AppCompatActivity
         ActivityCompat.OnRequestPermissionsResultCallback,
         NavigationView.OnNavigationItemSelectedListener,
         GoogleMap.OnCircleClickListener,
-        SensorEventListener{
+        SensorEventListener {
     /**
      * Request code for location permission request.
      *
      * @see #onRequestPermissionsResult(int, String[], int[])
      */
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private FusedLocationProviderClient mFusedLocationClient;
 
     /**
      * Flag indicating whether a requested permission has been denied after returning in
@@ -104,9 +109,11 @@ public class MapActivity extends AppCompatActivity
         if (accelerometer != null) {
             mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         }
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
     }
 
-    private void createHeader(){
+    private void createHeader() {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -172,9 +179,6 @@ public class MapActivity extends AppCompatActivity
 
         }
     }
-
-
-
 
 
     @Override
@@ -276,14 +280,16 @@ public class MapActivity extends AppCompatActivity
 
         String s = "unknown";
         List<CapturePoint> temp = GameSettings.capturePointList;
-        for(CapturePoint p : temp){
-            if(circle.getId().equals(p.getCircle().getId())){
+        for (CapturePoint p : temp) {
+            if (circle.getId().equals(p.getCircle().getId())) {
                 s = p.getName();
             }
         }
         t.makeText(this, s, Toast.LENGTH_LONG).show();
     }
 
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -300,13 +306,51 @@ public class MapActivity extends AppCompatActivity
 
                 if (acceleration > SHAKE_THRESHOLD) {
                     mLastShakeTime = curTime;
-                    Toast t = new Toast(this);
-                    t.makeText(this, "Shaky-shaky", Toast.LENGTH_LONG).show();
-                    
+                    checkIfWithinACircle();
                 }
             }
         }
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void checkIfWithinACircle() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location myLocation) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (myLocation != null) {
+                            for(CapturePoint p : GameSettings.capturePointList){
+                                float[] distance = new float[2];
+                                Circle circle = p.getCircle();
+                                Location.distanceBetween( myLocation.getLatitude(), myLocation.getLongitude(),
+                                        circle.getCenter().latitude, circle.getCenter().longitude, distance);
+
+                                if( distance[0] > circle.getRadius()  ){
+                                    Toast.makeText(getBaseContext(), "Shaky-shaky", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(getBaseContext(), "Captured Area", Toast.LENGTH_LONG).show();
+                                    p.chaneColor();
+                                }
+                            }
+                        }
+                    }
+                });
+
+
+
+    }
+
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {

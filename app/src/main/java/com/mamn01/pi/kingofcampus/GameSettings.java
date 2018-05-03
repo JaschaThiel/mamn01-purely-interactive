@@ -21,6 +21,7 @@ public class GameSettings {
     public static void init(GoogleMap mMap){
         capturePointList.add(new CapturePoint("kårhuset",mMap, new LatLng(55.712386, 13.209087)));
         capturePointList.add(new CapturePoint("IKDC",mMap, new LatLng(55.715135, 13.212273)));
+        capturePointList.add(new CapturePoint("LED",mMap, new LatLng(55.710929, 13.210208)));
     }
 
 

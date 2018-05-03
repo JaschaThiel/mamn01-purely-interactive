@@ -27,14 +27,14 @@ public class CapturePoint {
                 .center(point)
                 .radius(5)
                 .strokeColor(Color.TRANSPARENT)
-                .fillColor(Color.argb(0.5f,0,0,255)));
+                .fillColor(Color.rgb(0,0,255)));
         area.setClickable(true);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void chaneColor(){
         Random rand = new Random();
-        area.setFillColor(Color.argb(0.5f,(int)rand.nextFloat()*255,(int)rand.nextFloat()*255,(int)rand.nextFloat()*255));
+        area.setFillColor(Color.rgb((int)(rand.nextFloat()*255),(int)(rand.nextFloat()*255),(int)(rand.nextFloat()*255)));
     }
 
     public Circle getCircle(){
