@@ -278,6 +278,7 @@ public class MapActivity extends AppCompatActivity
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onCircleClick(Circle circle) {
         Toast t = new Toast(this);
@@ -352,21 +353,21 @@ public class MapActivity extends AppCompatActivity
                     }
                 });
 
-
-
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void doToast(String message){
         Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
         View toastView = toast.getView(); // This'll return the default View of the Toast.
 
         TextView toastMessage = (TextView) toastView.findViewById(android.R.id.message);
-        toastMessage.setTextSize(25);
-        toastMessage.setTextColor(Color.RED);
-        toastMessage.setGravity(Gravity.CENTER);
-        toastMessage.setCompoundDrawablePadding(16);
-        toastView.setBackgroundColor(Color.CYAN);
+        toastMessage.setTextSize(35);
+        toastMessage.setTextColor(Color.WHITE);
+        toastMessage.setGravity(Gravity.TOP);
+        toastMessage.setCompoundDrawablePadding(32);
+        toastView.setBackgroundColor(Color.argb(0.5f,0,0,0));
+        toast.setGravity(Gravity.TOP,0,130);
         toast.show();
     }
 
