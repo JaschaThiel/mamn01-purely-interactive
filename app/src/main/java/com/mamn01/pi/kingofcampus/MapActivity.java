@@ -42,10 +42,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -285,7 +289,8 @@ public class MapActivity extends AppCompatActivity
                 s = p.getName();
             }
         }
-        t.makeText(this, s, Toast.LENGTH_LONG).show();
+        doToast(s);
+       // t.makeText(this, s, Toast.LENGTH_LONG).show();
     }
 
 
@@ -349,6 +354,20 @@ public class MapActivity extends AppCompatActivity
 
 
 
+    }
+
+
+    public void doToast(String message){
+        Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
+        View toastView = toast.getView(); // This'll return the default View of the Toast.
+
+        TextView toastMessage = (TextView) toastView.findViewById(android.R.id.message);
+        toastMessage.setTextSize(25);
+        toastMessage.setTextColor(Color.RED);
+        toastMessage.setGravity(Gravity.CENTER);
+        toastMessage.setCompoundDrawablePadding(16);
+        toastView.setBackgroundColor(Color.CYAN);
+        toast.show();
     }
 
 
