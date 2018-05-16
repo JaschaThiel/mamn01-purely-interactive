@@ -119,7 +119,7 @@ public class MapActivity extends AppCompatActivity
             mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         }
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        easterEgg = "IKDCIKDCkårhusetLED";
+        easterEgg = "IKDCIKDCKårhusetLED";
         easterEggList = new ArrayList<>();
 
     }

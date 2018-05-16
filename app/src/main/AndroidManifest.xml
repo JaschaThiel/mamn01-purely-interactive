@@ -38,6 +38,10 @@
             android:name=".ResultActivity"
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".SplitViewActivity"
+            android:label=" "
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>
