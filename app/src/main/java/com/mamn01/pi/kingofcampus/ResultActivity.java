@@ -12,28 +12,35 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.HashMap;
+
 public class ResultActivity extends AppCompatActivity {
 
     private static final String TAG = "ResultActivity";
     private StorageReference mStorageReference;
-    private DatabaseReference mDatabase;
+    private FirebaseDatabase fDatabase;
+    private DatabaseReference dataRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
         mStorageReference = FirebaseStorage.getInstance().getReference();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        fDatabase = FirebaseDatabase.getInstance();
+        dataRef = fDatabase.getReference("");
 
         // Read from the database
-        mDatabase.addValueEventListener(new ValueEventListener() {
+        dataRef.addValueEventListener(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
-                Log.d(TAG, "Value is: " + value);
+                HashMap<String, Long> nodes;
+                nodes = (HashMap<String, Long>) dataSnapshot.getValue();
+                System.out.println("received nodes from database");
+                addValuesToSOmething(nodes);
+                Log.d(TAG, "Value is: " + nodes.toString());
             }
 
             @Override
@@ -43,6 +50,9 @@ public class ResultActivity extends AppCompatActivity {
             }
         });
 
+    }
 
+    public void addValuesToSOmething(HashMap<String, Long> nodeMap) {
+        System.out.println(nodeMap.toString());
     }
 }
