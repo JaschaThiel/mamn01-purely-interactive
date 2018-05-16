@@ -392,6 +392,7 @@ public class MapActivity extends AppCompatActivity
         }
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
                     @Override
                     public void onSuccess(Location myLocation) {
                         // Got last known location. In some rare situations this can be null.
