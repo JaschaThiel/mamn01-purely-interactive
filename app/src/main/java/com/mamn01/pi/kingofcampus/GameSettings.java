@@ -50,10 +50,8 @@ public class GameSettings {
         mStorageReference = FirebaseStorage.getInstance().getReference();
         fDatabase = FirebaseDatabase.getInstance();
         dataRef = fDatabase.getReference("");
-
         // Read from the database
         dataRef.addValueEventListener(new ValueEventListener() {
-
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -74,8 +72,8 @@ public class GameSettings {
         });
 
 //        capturePointList.add(new CapturePoint("Kårhuset",mMap, new LatLng(55.712386, 13.209087)));
-  //      capturePointList.add(new CapturePoint("IKDC",mMap, new LatLng(55.715135, 13.212273)));
-    //    capturePointList.add(new CapturePoint("LED",mMap, new LatLng(55.710929, 13.210208)));
+//      capturePointList.add(new CapturePoint("IKDC",mMap, new LatLng(55.715135, 13.212273)));
+//    capturePointList.add(new CapturePoint("LED",mMap, new LatLng(55.710929, 13.210208)));
     }
     @RequiresApi(api = Build.VERSION_CODES.O)
     private static void addValuesToList(HashMap<String, Long> capturePoints, GoogleMap map) {
@@ -83,13 +81,12 @@ public class GameSettings {
         map.clear();
         int i = 0;
         System.out.println(capturePoints.keySet());
-        for (String key : capturePoints.keySet()) {
-            capturePointList.add(new CapturePoint(key, map, capturePointLatLngList.get(i), capturePoints.get(key)));
+            for (String key : capturePoints.keySet()) {
+                capturePointList.add(new CapturePoint(key, map, capturePointLatLngList.get(i), capturePoints.get(key)));
             i ++;
 
         }
         System.out.println("The list contains " + capturePointList.size() + " Elements");
-
     }
 
 }
