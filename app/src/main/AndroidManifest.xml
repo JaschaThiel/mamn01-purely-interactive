@@ -26,6 +26,7 @@
             android:value="AIzaSyDkmFpPY6uz18lll9AXaIC53cJR7uV0l0o" />
 
         <activity
+            android:parentActivityName=".MapActivity"
             android:name=".MapActivity"
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme.NoActionBar" />
