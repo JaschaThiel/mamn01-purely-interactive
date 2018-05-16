@@ -16,7 +16,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends ListActivity {
 
-    String tests[] = { "MapActivity", "ResultActivity"};
+    String tests[] = { "MapActivity", "ResultActivity","CaptureActivity"};
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

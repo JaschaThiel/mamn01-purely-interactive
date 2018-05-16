@@ -334,7 +334,6 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private void doShake(){
         if(!isShaking){
             isShaking = true;
@@ -351,7 +350,6 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private void checkIfWithinACircle() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling

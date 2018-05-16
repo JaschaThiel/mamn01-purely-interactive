@@ -33,6 +33,11 @@
             android:name=".ResultActivity"
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+        android:name=".CaptureActivity"
+        android:label="Capture Activity"
+        android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>
