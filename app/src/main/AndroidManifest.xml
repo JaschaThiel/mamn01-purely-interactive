@@ -3,6 +3,8 @@
     package="com.mamn01.pi.kingofcampus">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
 
     <application
         android:allowBackup="true"
@@ -11,6 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".MainViewActivity"
             android:theme="@style/AppTheme"
             android:label=" ">
@@ -38,6 +41,15 @@
             android:name=".ResultActivity"
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+        android:name=".CaptureActivity"
+        android:label="Captre "
+        android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".SplitViewActivity"
+            android:label=" "
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

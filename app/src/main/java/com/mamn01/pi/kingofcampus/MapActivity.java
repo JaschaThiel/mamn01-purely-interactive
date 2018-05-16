@@ -4,8 +4,15 @@ package com.mamn01.pi.kingofcampus;
  * Created by Assar on 2018-04-24.
  */
 
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
@@ -16,10 +23,15 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -30,6 +42,8 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
@@ -40,6 +54,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -51,6 +66,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.Looper;
+
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -79,6 +96,7 @@ public class MapActivity extends AppCompatActivity
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private FusedLocationProviderClient mFusedLocationClient;
     private Toast toaster;
+    private LocationRequest mLocationRequest;
     /**
      * Flag indicating whether a requested permission has been denied after returning in
      * {@link #onRequestPermissionsResult(int, String[], int[])}.
@@ -89,8 +107,9 @@ public class MapActivity extends AppCompatActivity
     private View mapView;
 
     // variables for shake detection
-    private static final float SHAKE_THRESHOLD = 3.25f; // m/S**2
-    private static final int MIN_TIME_BETWEEN_SHAKES_MILLISECS = 1000;
+    private static final float SHAKE_THRESHOLD = 3.5f; // m/S**2
+    private static final int MIN_TIME_BETWEEN_SHAKES_MILLISECS = 2000;
+    private static final int SHAKE_DURATION = 1000;
     private long mLastShakeTime;
     private SensorManager mSensorManager;
     private String easterEgg;
@@ -98,17 +117,24 @@ public class MapActivity extends AppCompatActivity
     private View toastView;
     private TextView toastMessage;
     private Sensor accelerometer;
+    private boolean isShaking;
+    private long shakeTimer1, shakeTimer2;
+    private LocationCallback mLocationCallback;
+    private boolean mRequestingLocationUpdates;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.basic_demo);
-
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mRequestingLocationUpdates = false;
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mapView = mapFragment.getView();
         createHeader();
+        isShaking = false;
 
         // Get a sensor manager to listen for shakes
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -119,8 +145,26 @@ public class MapActivity extends AppCompatActivity
             mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         }
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        easterEgg = "IKDCIKDCkårhusetLED";
+        easterEgg = "IKDCIKDCKårhusetLED";
         easterEggList = new ArrayList<>();
+        mRequestingLocationUpdates = true;
+        createLocationRequest();
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    checkIfWithinACircle();
+                }
+            }
+
+            ;
+        };
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
 
     }
 
@@ -170,6 +214,8 @@ public class MapActivity extends AppCompatActivity
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
             layoutParams.setMargins(0, 0, 30, 30);
         }
+
+
 
 //        circle.setClickable(true);
 //        onCircleClick(cp.getCircle());
@@ -299,7 +345,7 @@ public class MapActivity extends AppCompatActivity
             }
         }
         doToast(s);
-       // t.makeText(this, s, Toast.LENGTH_LONG).show();
+        // t.makeText(this, s, Toast.LENGTH_LONG).show();
     }
 
 
@@ -317,25 +363,31 @@ public class MapActivity extends AppCompatActivity
                 double acceleration = Math.sqrt(Math.pow(x, 2) +
                         Math.pow(y, 2) +
                         Math.pow(z, 2)) - SensorManager.GRAVITY_EARTH;
-
                 if (acceleration > SHAKE_THRESHOLD) {
-                    mLastShakeTime = curTime;
-                    checkIfWithinACircle();
+                    doShake();
+                } else {
+                    isShaking = false;
+
                 }
             }
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void doShake() {
+        if (!isShaking) {
+            isShaking = true;
+            shakeTimer1 = System.currentTimeMillis();
+        } else {
+            shakeTimer2 = System.currentTimeMillis();
+            if ((shakeTimer2 - shakeTimer1) > SHAKE_DURATION) {
+                isShaking = false;
+                mLastShakeTime = shakeTimer2;
+                // checkIfWithinACircle();
+            }
+        }
+    }
     private void checkIfWithinACircle() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         mFusedLocationClient.getLastLocation()
@@ -344,17 +396,28 @@ public class MapActivity extends AppCompatActivity
                     public void onSuccess(Location myLocation) {
                         // Got last known location. In some rare situations this can be null.
                         if (myLocation != null) {
-                            for(CapturePoint p : GameSettings.capturePointList){
+                            for (CapturePoint p : GameSettings.capturePointList) {
                                 float[] distance = new float[2];
                                 Circle circle = p.getCircle();
-                                Location.distanceBetween( myLocation.getLatitude(), myLocation.getLongitude(),
+                                Location.distanceBetween(myLocation.getLatitude(), myLocation.getLongitude(),
                                         circle.getCenter().latitude, circle.getCenter().longitude, distance);
 
-                                if( distance[0] > circle.getRadius()  ){
-                                    Toast.makeText(getBaseContext(), "Shaky-shaky", Toast.LENGTH_LONG).show();
-                                } else {
-                                    Toast.makeText(getBaseContext(), "Captured Area", Toast.LENGTH_LONG).show();
-                                    p.chaneColor();
+                                if (distance[0] < circle.getRadius()) { //within circle
+                                    doToast("Within Circle");
+                                    vibrate();
+                                    p.setIsBeingCaptured(true);
+                                    openDialog();
+//                                    Class c = null;
+//                                    try {
+//                                        c = Class.forName("com.mamn01.pi.kingofcampus.CaptureActivity");
+//                                        Intent intent = new Intent(getApplicationContext(), c);
+//                                        startActivity(intent);
+//                                        p.setHasBeenCaptured(true);
+//                                        p.setPinkColor();
+//                                    } catch (ClassNotFoundException e) {
+//                                        e.printStackTrace();
+//                                    }
+
                                 }
                             }
                         }
@@ -362,25 +425,69 @@ public class MapActivity extends AppCompatActivity
                 });
     }
 
+    private void openDialog(){
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("You are within an enemy capture point");
+        builder.setMessage("Want to capture the area?");
+
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                Class c = null;
+                try {
+                c = Class.forName("com.mamn01.pi.kingofcampus.CaptureActivity");
+                Intent intent = new Intent(getApplicationContext(), c);
+                startActivity(intent);
+                } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                }
+            }
+        });
+
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                startLocationUpdates();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void vibrate() {
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 500 milliseconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            v.vibrate(500);
+        }
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void checkEasterEgg(){
+    private void checkEasterEgg() {
         StringBuilder sb = new StringBuilder();
-        for(String s : easterEggList){
+        for (String s : easterEggList) {
             sb.append(s);
         }
 
-        if(sb.toString().equals(easterEgg)){
+        if (sb.toString().equals(easterEgg)) {
             doEasterEgg();
         }
-        if(easterEggList.size() > 4){
+        if (easterEggList.size() > 4) {
             easterEggList.clear();
         }
     }
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void doEasterEgg(){
+    private void doEasterEgg() {
         String s = "Cheat code activated";
         List<CapturePoint> temp = GameSettings.capturePointList;
         for (CapturePoint p : temp) {
@@ -390,8 +497,8 @@ public class MapActivity extends AppCompatActivity
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void doToast(String message){
-        if(toaster != null){
+    public void doToast(String message) {
+        if (toaster != null) {
             toaster.cancel();
         }
         toaster = Toast.makeText(this, message, Toast.LENGTH_LONG);
@@ -402,10 +509,12 @@ public class MapActivity extends AppCompatActivity
         toastMessage.setTextColor(Color.WHITE);
         toastMessage.setGravity(Gravity.TOP);
         toastMessage.setCompoundDrawablePadding(32);
-        toastView.setBackgroundColor(Color.argb(0.5f,0,0,0));
-        toaster.setGravity(Gravity.TOP,0,130);
+        toastView.setBackgroundColor(Color.argb(0.5f, 0, 0, 0));
+        toaster.setGravity(Gravity.TOP, 0, 130);
         toaster.show();
     }
+
+
 
 
     @Override
@@ -413,15 +522,63 @@ public class MapActivity extends AppCompatActivity
 
     }
 
+
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this,accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        if (mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         mSensorManager.unregisterListener(this);
+        stopLocationUpdates();
     }
+
+    private void stopLocationUpdates() {
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+    }
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                mLocationCallback,
+                null /* Looper */);
+    }
+
+    private void createLocationRequest()
+    {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+
+        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                // All location settings are satisfied. The client can initialize
+                // location requests here.
+                // ...
+            }
+        });
+    }
+
+
+
+
 }

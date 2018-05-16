@@ -15,7 +15,7 @@ public class MainViewActivity extends AppCompatActivity {
 
     public void changeLayout(View view){
         try{
-            Class c = Class.forName("com.mamn01.pi.kingofcampus.MainActivity");
+            Class c = Class.forName("com.mamn01.pi.kingofcampus.SplitViewActivity");
             Intent intent = new Intent(this, c);
             startActivity(intent);
         }
