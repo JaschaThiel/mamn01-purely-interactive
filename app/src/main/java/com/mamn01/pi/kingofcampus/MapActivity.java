@@ -144,7 +144,8 @@ public class MapActivity extends AppCompatActivity
         if (accelerometer != null) {
             mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         }
-        easterEgg = "IKDCIKDCkårhusetLED";
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        easterEgg = "IKDCIKDCKårhusetLED";
         easterEggList = new ArrayList<>();
         mRequestingLocationUpdates = true;
         createLocationRequest();
