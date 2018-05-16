@@ -18,7 +18,7 @@ public class CustomDialog extends Dialog implements DialogInterface.OnClickListe
     Context context;
 
     public CustomDialog(Context c) {
-        super(c.getApplicationContext());
+        super(c);
         this.context = c;
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage("Are you sure?").setPositiveButton("Yes", this)
