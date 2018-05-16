@@ -22,6 +22,7 @@ public class GameSettings {
         capturePointList.add(new CapturePoint("kårhuset",mMap, new LatLng(55.712386, 13.209087)));
         capturePointList.add(new CapturePoint("IKDC",mMap, new LatLng(55.715135, 13.212273)));
         capturePointList.add(new CapturePoint("LED",mMap, new LatLng(55.710929, 13.210208)));
+        capturePointList.add(new CapturePoint("test",mMap, new LatLng(55.711173, 13.210493)));
     }
 
 

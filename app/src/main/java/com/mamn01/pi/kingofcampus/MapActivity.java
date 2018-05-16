@@ -29,6 +29,8 @@ import com.google.android.gms.tasks.Task;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -52,6 +54,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -119,7 +122,7 @@ public class MapActivity extends AppCompatActivity
     private LocationCallback mLocationCallback;
     private boolean mRequestingLocationUpdates;
 
-    private LooperThread looper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,8 +146,6 @@ public class MapActivity extends AppCompatActivity
         }
         easterEgg = "IKDCIKDCkårhusetLED";
         easterEggList = new ArrayList<>();
-
-        looper = new LooperThread();
         mRequestingLocationUpdates = true;
         createLocationRequest();
         mLocationCallback = new LocationCallback() {
@@ -403,6 +404,18 @@ public class MapActivity extends AppCompatActivity
                                 if (distance[0] < circle.getRadius()) { //within circle
                                     doToast("Within Circle");
                                     vibrate();
+                                    p.setIsBeingCaptured(true);
+                                    Class c = null;
+                                    try {
+                                        c = Class.forName("com.mamn01.pi.kingofcampus.CaptureActivity");
+                                        Intent intent = new Intent(getApplicationContext(), c);
+                                        startActivity(intent);
+                                        p.setHasBeenCaptured(true);
+                                        p.setPinkColor();
+                                    } catch (ClassNotFoundException e) {
+                                        e.printStackTrace();
+                                    }
+
                                 }
                             }
                         }
@@ -505,7 +518,8 @@ public class MapActivity extends AppCompatActivity
                 null /* Looper */);
     }
 
-    protected void createLocationRequest() {
+    private void createLocationRequest()
+    {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
@@ -526,5 +540,8 @@ public class MapActivity extends AppCompatActivity
             }
         });
     }
+
+
+
 
 }

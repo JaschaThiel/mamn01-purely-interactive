@@ -2,6 +2,7 @@ package com.mamn01.pi.kingofcampus;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -36,6 +37,7 @@ public class CaptureActivity extends Activity implements SensorEventListener {
     private Sensor accelerometer;
     private boolean isShaking;
     private long shakeTimer1, shakeTimer2;
+    private CapturePoint capturePoint;
 
 
     @Override
@@ -55,30 +57,12 @@ public class CaptureActivity extends Activity implements SensorEventListener {
         if (accelerometer != null) {
             mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         }
+        for(CapturePoint p : GameSettings.capturePointList){
+            if(p.isBeingCaptured){
+                capturePoint = p;
+            }
+        }
 
-        // Start long running operation in a background thread
-//        new Thread(new Runnable() {
-//            public void run() {
-//                while (progressStatus < 100) {
-//                    //progressStatus += 1;
-//                    // Update the progress bar and display the
-//                    //current value in the text view
-//                    handler.post(new Runnable() {
-//                        public void run() {
-//                            progressBar.setProgress(progressStatus);
-//                            //textView.setText(progressStatus+"/"+progressBar.getMax());
-//                        }
-//                    });
-//                    try {
-//                        // Sleep for 200 milliseconds.
-//                        Thread.sleep(200);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//                vibrate();
-//            }
-//        }).start();
     }
 
     @Override
@@ -111,7 +95,18 @@ public class CaptureActivity extends Activity implements SensorEventListener {
             vibrate();
         }
         if(progressStatus > 100){
-            progressStatus = 0;
+            Class c = null;
+            capturePoint.setIsBeingCaptured(false);
+            capturePoint.setHasBeenCaptured(true);
+            capturePoint.setPinkColor();
+            try {
+                c = Class.forName("com.mamn01.pi.kingofcampus.MapActivity");
+                Intent intent = new Intent(this, c);
+                startActivity(intent);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
         }
          progressBar.setProgress(progressStatus);
      }
