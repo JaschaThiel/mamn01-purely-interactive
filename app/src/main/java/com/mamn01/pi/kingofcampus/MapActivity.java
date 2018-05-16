@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -30,6 +31,8 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
@@ -89,8 +92,9 @@ public class MapActivity extends AppCompatActivity
     private View mapView;
 
     // variables for shake detection
-    private static final float SHAKE_THRESHOLD = 3.25f; // m/S**2
-    private static final int MIN_TIME_BETWEEN_SHAKES_MILLISECS = 1000;
+    private static final float SHAKE_THRESHOLD = 3.5f; // m/S**2
+    private static final int MIN_TIME_BETWEEN_SHAKES_MILLISECS = 2000;
+    private static final int SHAKE_DURATION = 1000;
     private long mLastShakeTime;
     private SensorManager mSensorManager;
     private String easterEgg;
@@ -98,6 +102,8 @@ public class MapActivity extends AppCompatActivity
     private View toastView;
     private TextView toastMessage;
     private Sensor accelerometer;
+    private boolean isShaking;
+    private long shakeTimer1, shakeTimer2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +115,7 @@ public class MapActivity extends AppCompatActivity
         mapFragment.getMapAsync(this);
         mapView = mapFragment.getView();
         createHeader();
+        isShaking = false;
 
         // Get a sensor manager to listen for shakes
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -317,11 +324,29 @@ public class MapActivity extends AppCompatActivity
                 double acceleration = Math.sqrt(Math.pow(x, 2) +
                         Math.pow(y, 2) +
                         Math.pow(z, 2)) - SensorManager.GRAVITY_EARTH;
-
                 if (acceleration > SHAKE_THRESHOLD) {
-                    mLastShakeTime = curTime;
-                    checkIfWithinACircle();
+                    doShake();
+                }else{
+                    isShaking = false;
+
                 }
+            }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void doShake(){
+        if(!isShaking){
+            isShaking = true;
+            shakeTimer1 = System.currentTimeMillis();
+        }else{
+            shakeTimer2 = System.currentTimeMillis();
+            System.out.println("SHAKING");
+            System.out.println("TIME LEFT: " + (shakeTimer2 - shakeTimer1));
+            if((shakeTimer2 - shakeTimer1) > SHAKE_DURATION){
+                isShaking = false;
+                mLastShakeTime = shakeTimer2;
+                checkIfWithinACircle();
             }
         }
     }
@@ -352,14 +377,28 @@ public class MapActivity extends AppCompatActivity
 
                                 if( distance[0] > circle.getRadius()  ){
                                     Toast.makeText(getBaseContext(), "Shaky-shaky", Toast.LENGTH_LONG).show();
+                                    vibrate();
                                 } else {
                                     Toast.makeText(getBaseContext(), "Captured Area", Toast.LENGTH_LONG).show();
+                                    doToast("Captured Area");
                                     p.chaneColor();
+                                    vibrate();
                                 }
                             }
                         }
                     }
                 });
+    }
+
+    private void vibrate() {
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 500 milliseconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            v.vibrate(500);
+        }
     }
 
 
