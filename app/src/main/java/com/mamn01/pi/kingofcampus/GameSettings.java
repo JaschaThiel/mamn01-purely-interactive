@@ -17,6 +17,7 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Assar on 2018-05-03.
@@ -50,6 +51,7 @@ public class GameSettings {
         mStorageReference = FirebaseStorage.getInstance().getReference();
         fDatabase = FirebaseDatabase.getInstance();
         dataRef = fDatabase.getReference("");
+
         // Read from the database
         dataRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -87,6 +89,30 @@ public class GameSettings {
 
         }
         System.out.println("The list contains " + capturePointList.size() + " Elements");
+    }
+
+    public static void addValue(CapturePoint p){
+        List<CapturePoint> tempList = new ArrayList<>();;
+        for(CapturePoint cp : capturePointList){
+            if(cp.equals(p)){
+                System.out.println("Remove : " + p.toString());
+                tempList.add(cp);
+            }
+        }
+        for(CapturePoint point : tempList){
+            System.out.println("Removed : " + point.toString());
+            capturePointList.remove(point);
+        }
+        System.out.println("Size: " + capturePointList.size());
+        capturePointList.add(p);
+
+        Map<String, Object> postValues = new HashMap<>();
+
+        for(CapturePoint point : capturePointList){
+            postValues.put(p.getName(),1);
+        }
+
+        dataRef.updateChildren(postValues);
     }
 
 }

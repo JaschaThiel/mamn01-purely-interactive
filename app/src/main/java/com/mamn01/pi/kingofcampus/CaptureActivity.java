@@ -96,9 +96,8 @@ public class CaptureActivity extends Activity implements SensorEventListener {
         }
         if(progressStatus > 100){
             Class c = null;
-            capturePoint.setIsBeingCaptured(false);
-            capturePoint.setHasBeenCaptured(true);
-            capturePoint.setPinkColor();
+            capturePoint.setHolder(1);
+            GameSettings.addValue(capturePoint);
             try {
                 c = Class.forName("com.mamn01.pi.kingofcampus.MapActivity");
                 Intent intent = new Intent(this, c);
