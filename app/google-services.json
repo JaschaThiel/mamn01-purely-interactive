@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_number": "900206531398",
+    "firebase_url": "https://mamn01-purely-interactive.firebaseio.com",
+    "project_id": "mamn01-purely-interactive",
+    "storage_bucket": "mamn01-purely-interactive.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:900206531398:android:b4574273c9899f49",
+        "android_client_info": {
+          "package_name": "com.mamn01.pi.kingofcampus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "900206531398-sqju93k4841upp15hmj9hnjmlkoekk3k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mamn01.pi.kingofcampus",
+            "certificate_hash": "396687d97d72818c1f4125f55ae832bc90ad2ce7"
+          }
+        },
+        {
+          "client_id": "900206531398-5rols417lko28pdid9uf2hvclmj1i9af.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [{ "current_key": "https://mamn01-purely-interactive.firebaseio.com/" }],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "900206531398-5rols417lko28pdid9uf2hvclmj1i9af.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
