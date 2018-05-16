@@ -406,22 +406,56 @@ public class MapActivity extends AppCompatActivity
                                     doToast("Within Circle");
                                     vibrate();
                                     p.setIsBeingCaptured(true);
-                                    Class c = null;
-                                    try {
-                                        c = Class.forName("com.mamn01.pi.kingofcampus.CaptureActivity");
-                                        Intent intent = new Intent(getApplicationContext(), c);
-                                        startActivity(intent);
-                                        p.setHasBeenCaptured(true);
-                                        p.setPinkColor();
-                                    } catch (ClassNotFoundException e) {
-                                        e.printStackTrace();
-                                    }
+                                    openDialog();
+//                                    Class c = null;
+//                                    try {
+//                                        c = Class.forName("com.mamn01.pi.kingofcampus.CaptureActivity");
+//                                        Intent intent = new Intent(getApplicationContext(), c);
+//                                        startActivity(intent);
+//                                        p.setHasBeenCaptured(true);
+//                                        p.setPinkColor();
+//                                    } catch (ClassNotFoundException e) {
+//                                        e.printStackTrace();
+//                                    }
 
                                 }
                             }
                         }
                     }
                 });
+    }
+
+    private void openDialog(){
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("You are within an enemy capture point");
+        builder.setMessage("Want to capture the area?");
+
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                Class c = null;
+                try {
+                c = Class.forName("com.mamn01.pi.kingofcampus.CaptureActivity");
+                Intent intent = new Intent(getApplicationContext(), c);
+                startActivity(intent);
+                } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                }
+            }
+        });
+
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                startLocationUpdates();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void vibrate() {
@@ -479,6 +513,8 @@ public class MapActivity extends AppCompatActivity
         toaster.setGravity(Gravity.TOP, 0, 130);
         toaster.show();
     }
+
+
 
 
     @Override
