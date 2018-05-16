@@ -17,6 +17,7 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Assar on 2018-05-03.
@@ -53,7 +54,6 @@ public class GameSettings {
 
         // Read from the database
         dataRef.addValueEventListener(new ValueEventListener() {
-
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -74,8 +74,8 @@ public class GameSettings {
         });
 
 //        capturePointList.add(new CapturePoint("Kårhuset",mMap, new LatLng(55.712386, 13.209087)));
-  //      capturePointList.add(new CapturePoint("IKDC",mMap, new LatLng(55.715135, 13.212273)));
-    //    capturePointList.add(new CapturePoint("LED",mMap, new LatLng(55.710929, 13.210208)));
+//      capturePointList.add(new CapturePoint("IKDC",mMap, new LatLng(55.715135, 13.212273)));
+//    capturePointList.add(new CapturePoint("LED",mMap, new LatLng(55.710929, 13.210208)));
     }
     @RequiresApi(api = Build.VERSION_CODES.O)
     private static void addValuesToList(HashMap<String, Long> capturePoints, GoogleMap map) {
@@ -83,13 +83,36 @@ public class GameSettings {
         map.clear();
         int i = 0;
         System.out.println(capturePoints.keySet());
-        for (String key : capturePoints.keySet()) {
-            capturePointList.add(new CapturePoint(key, map, capturePointLatLngList.get(i), capturePoints.get(key)));
+            for (String key : capturePoints.keySet()) {
+                capturePointList.add(new CapturePoint(key, map, capturePointLatLngList.get(i), capturePoints.get(key)));
             i ++;
 
         }
         System.out.println("The list contains " + capturePointList.size() + " Elements");
+    }
 
+    public static void addValue(CapturePoint p){
+        List<CapturePoint> tempList = new ArrayList<>();;
+        for(CapturePoint cp : capturePointList){
+            if(cp.equals(p)){
+                System.out.println("Remove : " + p.toString());
+                tempList.add(cp);
+            }
+        }
+        for(CapturePoint point : tempList){
+            System.out.println("Removed : " + point.toString());
+            capturePointList.remove(point);
+        }
+        System.out.println("Size: " + capturePointList.size());
+        capturePointList.add(p);
+
+        Map<String, Object> postValues = new HashMap<>();
+
+        for(CapturePoint point : capturePointList){
+            postValues.put(p.getName(),1);
+        }
+
+        dataRef.updateChildren(postValues);
     }
 
 }

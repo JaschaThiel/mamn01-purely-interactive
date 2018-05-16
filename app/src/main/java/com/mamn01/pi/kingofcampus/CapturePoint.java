@@ -21,12 +21,32 @@ public class CapturePoint {
     private Circle area;
     private boolean hasBeenCaptured;
     public boolean isBeingCaptured;
+    private int currentHolder;
+    private int currentColor;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public CapturePoint(String name, GoogleMap map, LatLng point, Long currentHolderLong){
         this.name = name;
-        int currentColor = Color.BLACK;
-        int currentHolder = Math.toIntExact(currentHolderLong);
+        currentColor = Color.BLACK;
+        currentHolder = Math.toIntExact(currentHolderLong);
+        setColor();
+
+        area = map.addCircle(new CircleOptions()
+                .center(point)
+                .radius(20)
+                .strokeColor(Color.TRANSPARENT)
+                .fillColor(currentColor));
+        area.setClickable(true);
+        hasBeenCaptured = false;
+        isBeingCaptured = false;
+    }
+
+    public void setHolder(int value){
+        currentHolder = value;
+        setColor();
+    }
+
+    private void setColor(){
         switch (currentHolder){
             case 1:
                 // Data
@@ -67,14 +87,6 @@ public class CapturePoint {
                 break;
 
         }
-        area = map.addCircle(new CircleOptions()
-                .center(point)
-                .radius(20)
-                .strokeColor(Color.TRANSPARENT)
-                .fillColor(currentColor));
-        area.setClickable(true);
-        hasBeenCaptured = false;
-        isBeingCaptured = false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -109,4 +121,12 @@ public class CapturePoint {
     public String getName(){
         return name;
     }
+
+    public boolean equals(CapturePoint p1){
+        if(p1.getName().equals(name)){
+            return true;
+        }
+        return false;
+    }
+
 }
