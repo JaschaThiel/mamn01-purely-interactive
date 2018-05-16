@@ -25,7 +25,7 @@ public class CapturePoint {
         this.name = name;
         area = map.addCircle(new CircleOptions()
                 .center(point)
-                .radius(5)
+                .radius(20)
                 .strokeColor(Color.TRANSPARENT)
                 .fillColor(Color.rgb(0,0,255)));
         area.setClickable(true);
@@ -35,6 +35,10 @@ public class CapturePoint {
     public void chaneColor(){
         Random rand = new Random();
         area.setFillColor(Color.rgb((int)(rand.nextFloat()*255),(int)(rand.nextFloat()*255),(int)(rand.nextFloat()*255)));
+    }
+
+    public void setPinkColor(){
+        area.setFillColor(Color.rgb(225,35,157));
     }
 
     public Circle getCircle(){
