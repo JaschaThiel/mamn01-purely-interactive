@@ -52,6 +52,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class MapActivity extends AppCompatActivity
      */
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private FusedLocationProviderClient mFusedLocationClient;
-
+    private Toast toaster;
     /**
      * Flag indicating whether a requested permission has been denied after returning in
      * {@link #onRequestPermissionsResult(int, String[], int[])}.
@@ -92,7 +93,11 @@ public class MapActivity extends AppCompatActivity
     private static final int MIN_TIME_BETWEEN_SHAKES_MILLISECS = 1000;
     private long mLastShakeTime;
     private SensorManager mSensorManager;
-
+    private String easterEgg;
+    private List<String> easterEggList;
+    private View toastView;
+    private TextView toastMessage;
+    private Sensor accelerometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,11 +114,13 @@ public class MapActivity extends AppCompatActivity
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         // Listen for shakes
-        Sensor accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if (accelerometer != null) {
             mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         }
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        easterEgg = "IKDCIKDCkårhusetLED";
+        easterEggList = new ArrayList<>();
 
     }
 
@@ -281,13 +288,14 @@ public class MapActivity extends AppCompatActivity
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onCircleClick(Circle circle) {
-        Toast t = new Toast(this);
 
         String s = "unknown";
         List<CapturePoint> temp = GameSettings.capturePointList;
         for (CapturePoint p : temp) {
             if (circle.getId().equals(p.getCircle().getId())) {
                 s = p.getName();
+                easterEggList.add(s);
+                checkEasterEgg();
             }
         }
         doToast(s);
@@ -352,28 +360,68 @@ public class MapActivity extends AppCompatActivity
                         }
                     }
                 });
-
     }
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void doToast(String message){
-        Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
-        View toastView = toast.getView(); // This'll return the default View of the Toast.
+    private void checkEasterEgg(){
+        StringBuilder sb = new StringBuilder();
+        for(String s : easterEggList){
+            sb.append(s);
+        }
 
-        TextView toastMessage = (TextView) toastView.findViewById(android.R.id.message);
+        if(sb.toString().equals(easterEgg)){
+            doEasterEgg();
+        }
+        if(easterEggList.size() > 4){
+            easterEggList.clear();
+        }
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void doEasterEgg(){
+        String s = "Cheat code activated";
+        List<CapturePoint> temp = GameSettings.capturePointList;
+        for (CapturePoint p : temp) {
+            p.setPinkColor();
+        }
+        doToast(s);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void doToast(String message){
+        if(toaster != null){
+            toaster.cancel();
+        }
+        toaster = Toast.makeText(this, message, Toast.LENGTH_LONG);
+        toastView = toaster.getView(); // This'll return the default View of the Toast.
+
+        toastMessage = (TextView) toastView.findViewById(android.R.id.message);
         toastMessage.setTextSize(35);
         toastMessage.setTextColor(Color.WHITE);
         toastMessage.setGravity(Gravity.TOP);
         toastMessage.setCompoundDrawablePadding(32);
         toastView.setBackgroundColor(Color.argb(0.5f,0,0,0));
-        toast.setGravity(Gravity.TOP,0,130);
-        toast.show();
+        toaster.setGravity(Gravity.TOP,0,130);
+        toaster.show();
     }
 
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        mSensorManager.registerListener(this,accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        mSensorManager.unregisterListener(this);
     }
 }
