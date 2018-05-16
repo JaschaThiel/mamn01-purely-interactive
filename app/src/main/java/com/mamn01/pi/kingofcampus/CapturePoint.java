@@ -19,6 +19,8 @@ public class CapturePoint {
 
     private String name;
     private Circle area;
+    private boolean hasBeenCaptured;
+    public boolean isBeingCaptured;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public CapturePoint(String name, GoogleMap map, LatLng point){
@@ -29,6 +31,8 @@ public class CapturePoint {
                 .strokeColor(Color.TRANSPARENT)
                 .fillColor(Color.rgb(0,0,255)));
         area.setClickable(true);
+        hasBeenCaptured = false;
+        isBeingCaptured = false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -39,6 +43,22 @@ public class CapturePoint {
 
     public void setPinkColor(){
         area.setFillColor(Color.rgb(225,35,157));
+    }
+
+    public void setHasBeenCaptured(boolean value){
+        hasBeenCaptured = value;
+    }
+
+    public boolean hasBeenCaptured(){
+        return hasBeenCaptured;
+    }
+
+    public void setIsBeingCaptured(boolean value){
+        isBeingCaptured = value;
+    }
+
+    public boolean isBeingCaptured(){
+        return isBeingCaptured;
     }
 
     public Circle getCircle(){
