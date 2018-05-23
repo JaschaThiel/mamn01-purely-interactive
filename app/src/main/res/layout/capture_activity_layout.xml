@@ -3,7 +3,10 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:gravity="center"
-    tools:context=".CaptureActivity" >
+    tools:context=".CaptureActivity"
+    android:background="@color/colorPrimaryDark">
+
+
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -15,13 +18,15 @@
         android:progress="1"
         android:minHeight="200dp"
         android:minWidth="300dp"
-        android:gravity ="center"/>
+        android:gravity ="center" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/shake"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/progressBar"
-        android:layout_below="@+id/progressBar"/>
+        android:gravity="top|center_horizontal"
+        android:textSize="30dp"
+        android:textColor="#FFFFFF"/>
+
 
 </RelativeLayout>

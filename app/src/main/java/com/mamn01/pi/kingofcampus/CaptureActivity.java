@@ -3,10 +3,12 @@ package com.mamn01.pi.kingofcampus;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import java.util.Random;
 
 
 /**
@@ -38,16 +42,27 @@ public class CaptureActivity extends Activity implements SensorEventListener {
     private boolean isShaking;
     private long shakeTimer1, shakeTimer2;
     private CapturePoint capturePoint;
-
+    private Random rand;
+    private MediaPlayer mp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.capture_activity_layout);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        textView = (TextView) findViewById(R.id.textView);
+        textView = (TextView) findViewById(R.id.shake);
+        textView.setText("SHAKE YOUR PHONE!");
         isShaking = false;
-        progressBar.setScaleY(5f);
+        rand = new Random();
+
+
+        progressBar.getProgressDrawable().setColorFilter(
+                Color.MAGENTA, android.graphics.PorterDuff.Mode.SRC_IN);
+
+        progressBar.setScaleY(15f);
+
+        mp = MediaPlayer.create(getApplicationContext(), R.raw.capt);
+        mp.setLooping(false);
 
         // Get a sensor manager to listen for shakes
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -95,6 +110,11 @@ public class CaptureActivity extends Activity implements SensorEventListener {
             vibrate();
         }
         if(progressStatus > 100){
+            textView.setText("AREA CAPTURED!");
+            mp.start();
+            while (mp.isPlaying()){
+
+            }
             Class c = null;
             capturePoint.setHolder(1);
             GameSettings.addValue(capturePoint);
