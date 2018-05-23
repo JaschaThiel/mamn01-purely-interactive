@@ -32,9 +32,16 @@
             <ImageView
                 android:id="@+id/img_real_chart"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="400dp"
                 android:layout_below="@+id/txt_top"
                 android:src="@drawable/image1" />
+
+            <ImageView
+                android:id="@+id/img_real_chart2"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_below="@+id/img_real_chart"
+                android:src="@drawable/image2" />
 
 
         </LinearLayout>
