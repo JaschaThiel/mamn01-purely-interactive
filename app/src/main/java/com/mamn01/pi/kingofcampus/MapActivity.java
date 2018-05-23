@@ -243,6 +243,9 @@ public class MapActivity extends AppCompatActivity
         Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).
+        for(CapturePoint p : GameSettings.capturePointList){
+            p.setShouldNotCapture(true);
+        }
         return false;
     }
 
@@ -402,10 +405,11 @@ public class MapActivity extends AppCompatActivity
                                 Location.distanceBetween(myLocation.getLatitude(), myLocation.getLongitude(),
                                         circle.getCenter().latitude, circle.getCenter().longitude, distance);
 
-                                if (distance[0] < circle.getRadius()) { //within circle
+                                if (distance[0] < circle.getRadius() && p.shouldCapture() && p.getHolderValue() != 1) { //within circle
                                     doToast("Within Circle");
                                     vibrate();
                                     p.setIsBeingCaptured(true);
+                                    p.setShouldNotCapture(false);
                                     openDialog();
 //                                    Class c = null;
 //                                    try {

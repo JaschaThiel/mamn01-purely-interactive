@@ -45,7 +45,11 @@ public class GameSettings {
 
         capturePointLatLngList.add(new LatLng(55.712386, 13.209087)); // Karhuset
 
-        capturePointLatLngList.add(new LatLng(55.710929, 13.210208)); // LED
+       // capturePointLatLngList.add(new LatLng(55.710929, 13.210208)); // LED
+
+        capturePointLatLngList.add(new LatLng(55.721375,13.216039)); //Kämnärs
+
+        capturePointLatLngList.add(new LatLng(55.711117,13.209472)); //Grisarna
 
 
         mStorageReference = FirebaseStorage.getInstance().getReference();
