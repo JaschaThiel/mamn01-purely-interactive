@@ -35,7 +35,7 @@ public class CapturePoint {
         shouldCapture = true;
         area = map.addCircle(new CircleOptions()
                 .center(point)
-                .radius(20)
+                .radius(12)
                 .strokeColor(Color.TRANSPARENT)
                 .fillColor(currentColor));
         area.setClickable(true);
