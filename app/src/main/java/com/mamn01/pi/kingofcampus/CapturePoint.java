@@ -24,13 +24,15 @@ public class CapturePoint {
     private int currentHolder;
     private int currentColor;
 
+    private boolean shouldCapture;
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     public CapturePoint(String name, GoogleMap map, LatLng point, Long currentHolderLong){
         this.name = name;
         currentColor = Color.BLACK;
         currentHolder = Math.toIntExact(currentHolderLong);
         setColor();
-
+        shouldCapture = true;
         area = map.addCircle(new CircleOptions()
                 .center(point)
                 .radius(20)
@@ -44,6 +46,18 @@ public class CapturePoint {
     public void setHolder(int value){
         currentHolder = value;
         setColor();
+    }
+
+    public void setShouldNotCapture(boolean value){
+        shouldCapture = value;
+    }
+
+    public boolean shouldCapture(){
+        return shouldCapture;
+    }
+
+    public int getHolderValue(){
+        return currentHolder;
     }
 
     private void setColor(){
